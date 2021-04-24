@@ -1,0 +1,25 @@
+{
+  "name": "hypixelapiquerybuilder",
+  "version": "1.0.0",
+  "description": "Simple web-based GUI for building Hypixel API queries",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "run": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RegexMC/Hypixel-API-Query-Builder.git"
+  },
+  "author": "RegexMC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RegexMC/Hypixel-API-Query-Builder/issues"
+  },
+  "homepage": "https://github.com/RegexMC/Hypixel-API-Query-Builder#readme"
+}
