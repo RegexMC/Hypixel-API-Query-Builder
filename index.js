@@ -1,6 +1,6 @@
-const port = 53354;
+const port = 53354; // Changing this won't change all the references in the script file (js/index.js)
 const express = require("express");
-const cors = require('cors');
+const cors = require("cors");
 const fetch = require("node-fetch").default;
 const fs = require("fs");
 const server = express();
@@ -21,12 +21,26 @@ server.post("/config/set", (req, res) => {
 	}
 });
 
+server.get("/status/", (req, res) => {
+	res.send("true");
+});
+
 server.get("/query/", (req, res) => {
-	const url = "https://api.hypixel.net/" + req.url.substring("/query/?".length);
-	fetch(url)
+	fetch(`https://api.hypixel.net/${req.url.substring("/query/?".length)}`)
 		.then((result) => result.json())
 		.then((result) => {
 			res.send(result);
+		})
+		.catch((err) => {
+			res.send(err);
+		});
+});
+
+server.get("/username/:username", (req, res) => {
+	fetch(`https://api.mojang.com/users/profiles/minecraft/${req.url.substring("/username/".length)}`)
+		.then((result) => result.json())
+		.then((result) => {
+			res.send(result.id);
 		})
 		.catch((err) => {
 			res.send(err);

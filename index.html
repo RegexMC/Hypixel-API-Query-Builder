@@ -1,70 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Hypixel API Query Builder</title>
-		<link href="css/bootstrap.min.css" rel="stylesheet" />
-		<link href="css/jsonviewer.css" rel="stylesheet" />
-	</head>
-	<body>
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-			<div class="container">
-				<div class="input-group mb-3">
-					<input class="form-control mr-sm-2" id="apiKey" type="password" placeholder="API Key" aria-label="key" />
-					<div class="input-group-append">
-						<button class="btn btn-success" id="saveButton" type="button">Save</button>
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Hypixel API Query Builder</title>
+	<link href="css/bootstrap.min.css" rel="stylesheet" />
+	<link href="css/jsonviewer.css" rel="stylesheet" />
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<div class="container-fluid">
+			<div class="input-group mb-3">
+				<input class="form-control mr-sm-2" id="apiKey" type="password" placeholder="API Key"
+					aria-label="key" />
+				<div class="input-group-append">
+					<button class="btn btn-success" id="saveButton" type="button">Save</button>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-2">
+				<div class="float-left">
+					<div class="mb-3 col-xs-2">
+						<label for="username" class="form-label">Username</label>
+						<input type="text" class="form-control" id="username" />
+					</div>
+					<button id="username-button" class="btn btn-success">Get UUID</button>
+					<div class="input-group mb-3">
+						<input type="text" class="form-control mr-sm-2" id="uuid" readonly />
+						<div class="input-group-append">
+							<button class="btn btn-outline-primary" id="copyUUID" type="button">Copy</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</nav>
-		<div class="container" id="endpoint-buttons">
-			<h2>Endpoint</h2>
-			<button type="button" id="endpoint-key" class="btn btn-outline-secondary">key</button>
-			<button type="button" id="endpoint-player" class="btn btn-outline-secondary">player</button>
-			<button type="button" id="endpoint-friends" class="btn btn-outline-secondary">friends</button>
-			<button type="button" id="endpoint-recentgames" class="btn btn-outline-secondary">recentgames</button>
-			<button type="button" id="endpoint-status" class="btn btn-outline-secondary">status</button>
-			<button type="button" id="endpoint-guild" class="btn btn-outline-secondary">guild</button>
-			<button type="button" id="endpoint-boosters" class="btn btn-outline-secondary">boosters</button>
-			<button type="button" id="endpoint-counts" class="btn btn-outline-secondary">counts</button>
-			<button type="button" id="endpoint-leaderboards" class="btn btn-outline-secondary">leaderboards</button>
-			<button type="button" id="endpoint-punishmentstats" class="btn btn-outline-secondary">punishmentstats</button>
-			<button type="button" id="endpoint-resources/achievements" class="btn btn-outline-secondary">resources/achievements</button>
-			<button type="button" id="endpoint-resources/challenges" class="btn btn-outline-secondary">resources/challenges</button>
-			<button type="button" id="endpoint-resources/quests" class="btn btn-outline-secondary">resources/quests</button>
-			<button type="button" id="endpoint-resources/guilds/achievements" class="btn btn-outline-secondary">resources/guilds/achievements</button>
-			<button type="button" id="endpoint-resources/guilds/permissions" class="btn btn-outline-secondary">resources/guilds/permissions</button>
-			<button type="button" id="endpoint-resources/skyblock/collections" class="btn btn-outline-secondary">resources/skyblock/collections</button>
-			<button type="button" id="endpoint-resources/skyblock/skills" class="btn btn-outline-secondary">resources/skyblock/skills</button>
-			<button type="button" id="endpoint-skyblock/news" class="btn btn-outline-secondary">skyblock/news</button>
-			<button type="button" id="endpoint-skyblock/auction" class="btn btn-outline-secondary">skyblock/auction</button>
-			<button type="button" id="endpoint-skyblock/auctions" class="btn btn-outline-secondary">skyblock/auctions</button>
-			<button type="button" id="endpoint-skyblock/auctions_ended" class="btn btn-outline-secondary">skyblock/auctions_ended</button>
-			<button type="button" id="endpoint-skyblock/bazaar" class="btn btn-outline-secondary">skyblock/bazaar</button>
-			<button type="button" id="endpoint-skyblock/profile" class="btn btn-outline-secondary">skyblock/profile</button>
-			<button type="button" id="endpoint-skyblock/profiles" class="btn btn-outline-secondary">skyblock/profiles</button>
-		</div>
-		<div class="container" id="parameters" style="visibility: hidden">
-			<hr />
-		</div>
-		<div class="container">
-			<hr />
-			<div class="input-group mb-3">
-				<input class="form-control mr-sm-2" type="text" id="resultURL" readonly />
-				<div class="input-group-append">
-					<button class="btn btn-success" id="runButton" type="button">Run</button>
+			<div class="col-6">
+				<div class="container-fluid" id="endpoint-buttons">
+					<h2>Endpoint</h2>
+					<button type="button" id="endpoint-key" class="btn btn-outline-secondary">key</button>
+					<button type="button" id="endpoint-player" class="btn btn-outline-secondary">player</button>
+					<button type="button" id="endpoint-friends" class="btn btn-outline-secondary">friends</button>
+					<button type="button" id="endpoint-recentgames"
+						class="btn btn-outline-secondary">recentgames</button>
+					<button type="button" id="endpoint-status" class="btn btn-outline-secondary">status</button>
+					<button type="button" id="endpoint-guild" class="btn btn-outline-secondary">guild</button>
+					<button type="button" id="endpoint-boosters" class="btn btn-outline-secondary">boosters</button>
+					<button type="button" id="endpoint-counts" class="btn btn-outline-secondary">counts</button>
+					<button type="button" id="endpoint-leaderboards"
+						class="btn btn-outline-secondary">leaderboards</button>
+					<button type="button" id="endpoint-punishmentstats"
+						class="btn btn-outline-secondary">punishmentstats</button>
+					<button type="button" id="endpoint-resources/achievements"
+						class="btn btn-outline-secondary">resources/achievements</button>
+					<button type="button" id="endpoint-resources/challenges"
+						class="btn btn-outline-secondary">resources/challenges</button>
+					<button type="button" id="endpoint-resources/quests"
+						class="btn btn-outline-secondary">resources/quests</button>
+					<button type="button" id="endpoint-resources/guilds/achievements"
+						class="btn btn-outline-secondary">resources/guilds/achievements</button>
+					<button type="button" id="endpoint-resources/guilds/permissions"
+						class="btn btn-outline-secondary">resources/guilds/permissions</button>
+					<button type="button" id="endpoint-resources/skyblock/collections"
+						class="btn btn-outline-secondary">resources/skyblock/collections</button>
+					<button type="button" id="endpoint-resources/skyblock/skills"
+						class="btn btn-outline-secondary">resources/skyblock/skills</button>
+					<button type="button" id="endpoint-skyblock/news"
+						class="btn btn-outline-secondary">skyblock/news</button>
+					<button type="button" id="endpoint-skyblock/auction"
+						class="btn btn-outline-secondary">skyblock/auction</button>
+					<button type="button" id="endpoint-skyblock/auctions"
+						class="btn btn-outline-secondary">skyblock/auctions</button>
+					<button type="button" id="endpoint-skyblock/auctions_ended"
+						class="btn btn-outline-secondary">skyblock/auctions_ended</button>
+					<button type="button" id="endpoint-skyblock/bazaar"
+						class="btn btn-outline-secondary">skyblock/bazaar</button>
+					<button type="button" id="endpoint-skyblock/profile"
+						class="btn btn-outline-secondary">skyblock/profile</button>
+					<button type="button" id="endpoint-skyblock/profiles"
+						class="btn btn-outline-secondary">skyblock/profiles</button>
+				</div>
+				<div class="container-fluid" id="parameters" style="visibility: hidden">
+					<hr />
+				</div>
+				<div class="container-fluid">
+					<hr />
+					<div class="input-group mb-3">
+						<input class="form-control mr-sm-2" type="text" id="resultURL" readonly />
+						<div class="input-group-append">
+							<button class="btn btn-success" id="runButton" type="button">Run</button>
+						</div>
+					</div>
+					<div class="input-group mb-3">
+						<select id="options" class="form-select">
+							<option value="javascript_fetch">Javascript - Fetch</option>
+							<option value="javascript_axios">Javascript - Axios</option>
+						</select>
+						<div class="input-group-append">
+							<button class="btn btn-outline-primary" id="copyAs">Copy</button>
+						</div>
+					</div>
+
+					<textarea class="form-control" id="copyAsResponse" rows="3" readonly></textarea>
 				</div>
 			</div>
+			<div class="col pad-right overflow-auto">
+				<div class="container-fluid">
+					<textarea class="form-control" id="output" rows="5" readonly></textarea>
+				</div>
+				<div class="container-fluid" id="view"></div>
+			</div>
 		</div>
-		<div class="container">
-			<input type="button" class="btn btn-outline-primary" id="copyButton" value="Copy" />
-			<textarea class="form-control" id="output" rows="5" readonly></textarea>
-		</div>
-		<div class="container" id="view"></div>
+
 		<script src="js/jquery-3.6.0.min.js"></script>
 		<script src="js/bootstrap.bundle.min.js"></script>
 		<script src="js/index.js"></script>
-	</body>
+</body>
+
 </html>

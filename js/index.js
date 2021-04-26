@@ -1,5 +1,10 @@
+// TODO: Add required fields actually be required; save uuid
 var prevElement;
+var url = "";
+var pars = {};
+var debug = true; // Stops checking if the server is alive, helpful for when working only on the HTML
 
+// List of (all?) hypixel api endpoints. Each endpoint has extra unused info for future features
 const endpoints = [
 	{
 		path: "key",
@@ -203,9 +208,17 @@ const endpoints = [
 	}
 ];
 
-var url = "";
-
+// When the doc loads check if the NodeJS server is alive
 document.addEventListener("DOMContentLoaded", (event) => {
+	if (!debug) {
+		fetch("http://localhost:53354/status/")
+			.then((result) => {
+				// Server Alive
+			})
+			.catch((err) => {
+				document.body.innerHTML = "<h1> Please start server (instructions on GitHub) </h1>";
+			});
+	}
 	fetch("http://localhost:53354/config/get")
 		.then((result) => result.json())
 		.then((result) => {
@@ -214,50 +227,66 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 document.getElementById("endpoint-buttons").addEventListener("click", (event) => {
-	if (event.target.id.toLowerCase() === "endpoint-buttons") return;
+	if (event.target.id.toLowerCase() === "endpoint-buttons") return; // Check if clicking emptyness
+	// Reset style of previously clicked button
 	if (prevElement) {
-		if (prevElement.id == event.target.id) return;
+		if (prevElement.id == event.target.id) return; // Button already selected, don't do anything
 		prevElement.classList.remove("btn-secondary");
 		prevElement.classList.add("btn-outline-secondary");
 	}
+	// Update the prevElement to currently clicked one.
 	prevElement = event.target;
+
+	// Add styling to clicked button
 	event.target.classList.add("btn-secondary");
 	event.target.classList.remove("btn-outline-secondary");
 
+	// Get endpoint of button clicked
 	const path = event.target.id.substr(event.target.id.indexOf("-") + 1);
 	const endpoint = endpoints.find((endpoint) => endpoint.path == path);
 
 	var parametersDiv = document.getElementById("parameters");
 	parametersDiv.innerHTML = "<hr>";
 
+	// If no endpoint found for the button (shouldn't happen) return and hide the parameters input
 	if (endpoint == null) return (parametersDiv.style.visibility = "hidden");
 
+	// Set url to the correct endpoint with key
 	url = `https://api.hypixel.net/${endpoint.path}?key=${document.getElementById("apiKey").value}`;
+
+	// Update the resulting query with the key hidden
 	document.getElementById("resultURL").value = url.replace(/\?key=(.+)/, "?key=***");
 
 	const parameters = endpoint.parameters;
+
+	// Check if the endpoint doesnt have any parameters, then return if so.
 	if (parameters == null || parameters.length == 0) {
+		copyAs();
 		return (parametersDiv.style.visibility = "hidden");
 	}
 
-	paramsToAppend = "";
-
-	var pars = {};
-
+	pars = {};
 	parameters.forEach((parameter) => {
+		// Create parent div for the parameters inputs
 		var div = document.createElement("div");
 		div.classList.add("mb-3");
+
+		// Create label to define what parameter the textbox is for, along with if it's required
 		var label = document.createElement("label");
 		label.classList.add("form-label");
 		label.setAttribute("for", parameter.key + "-in");
 		label.innerHTML = `${parameter.key}:${parameter.type}${parameter.required === "true" ? "*" : ""}`;
+
+		// Create textbox for input
 		var input = document.createElement("input");
 		input.classList.add("form-control");
 		input.setAttribute("type", "text");
 		input.id = parameter.key + "-n";
 
+		// Can't remember what this is for lol
 		pars[parameter.key] = "";
 
+		// Listen for any input on this parameter, and update the output query
 		input.addEventListener("input", (e) => {
 			pars[parameter.key] = e.target.value;
 			url = `https://api.hypixel.net/${endpoint.path}?key=${document.getElementById("apiKey").value}`;
@@ -269,13 +298,17 @@ document.getElementById("endpoint-buttons").addEventListener("click", (event) =>
 			});
 
 			document.getElementById("resultURL").value = url.replace(/\?key=[^&]+/, "?key=***");
+			copyAs();
 		});
+
+		// Append the label and input to the parent div
 		div.appendChild(label);
 		div.appendChild(input);
 		parametersDiv.appendChild(div);
 	});
 
 	parametersDiv.style.visibility = "visible";
+	copyAs();
 });
 
 document.getElementById("apiKey").addEventListener("input", (event) => {
@@ -292,6 +325,32 @@ document.getElementById("saveButton").addEventListener("click", (event) => {
 			key: document.getElementById("apiKey").value
 		})
 	);
+});
+
+document.getElementById("username-button").addEventListener("click", (event) => {
+	event.target.disabled = true;
+	fetch(`http://localhost:53354/username/${document.getElementById("username").value}`)
+		.then((result) => result.text())
+		.then((result) => {
+			document.getElementById("uuid").value = result;
+			event.target.disabled = false;
+		})
+		.catch((err) => {
+			console.log(err);
+			event.target.disabled = false;
+		});
+});
+
+document.getElementById("username").addEventListener("keyup", function (event) {
+	event.preventDefault();
+	if (event.keyCode === 13) {
+		document.getElementById("username-button").click();
+	}
+});
+
+document.getElementById("copyUUID").addEventListener("click", (event) => {
+	document.getElementById("uuid").select();
+	document.execCommand("copy");
 });
 
 document.getElementById("runButton").addEventListener("click", (event) => {
@@ -317,10 +376,43 @@ document.getElementById("runButton").addEventListener("click", (event) => {
 		});
 });
 
-document.getElementById("copyButton").addEventListener("click", (event) => {
-	document.getElementById("output").select();
+document.getElementById("copyAs").addEventListener("click", (event) => {
+	document.getElementById("copyAsResponse").select();
 	document.execCommand("copy");
 });
+
+document.getElementById("options").addEventListener("change", () => {
+	copyAs();
+});
+
+document.getElementById("output").addEventListener("click", (event) => {
+	event.target.select();
+});
+
+function copyAs() {
+	const options = document.getElementById("options");
+	const selected = options.value;
+	if (selected == "javascript_fetch") {
+		var query = `fetch("${url.replace(/\?key=[^&]+/, "?key=***")}")
+			.then((response) => response.json())
+			.then((response) => console.log(JSON.stringify(response)))
+			.catch((err) => console.log(err));`;
+		document.getElementById("copyAsResponse").value = query;
+	} else if (selected == "javascript_axios") {
+		var params = pars;
+		params["key"] = "***";
+		var query = `axios.get("${url.split("?")[0]}", {
+			params: ${JSON.stringify(params)}	
+			}).then((response) => {
+				const data = response.data;
+				console.log(JSON.stringify(data));
+			}).catch((err) => {
+				console.log(err);
+			});
+			`;
+		document.getElementById("copyAsResponse").value = query;
+	}
+}
 
 /* https://github.com/LorDOniX/json-viewer */
 
